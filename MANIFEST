@@ -1,0 +1,7 @@
+README.txt
+LICENSE.txt
+MANIFEST
+setup.py
+SolexaTools/solexatools.py
+SolexaTools/__init__.py
+scripts/assign_peaks.py
