@@ -6,6 +6,18 @@ from numpy import max
 from optparse import OptionParser
 from SolexaTools.solexatools import SimpleTrack
 
+def max_val(features):
+	test = map(lambda x: x[3], features)
+	return max(test)
+
+def max_feature(features):
+	features.sort(cmp=lambda x,y: cmp(x[3],y[3]))
+	return features[-1]
+
+def fraction(features, f):
+	m = max_val(features)
+	return filter(lambda x:x[3] >= f * m, features)
+
 
 parser = OptionParser()
 parser.add_option("-p", "--peakfile", dest="peakfile", help="Peaks in (fixedStep) Wiggle/bed format", metavar="FILE")
