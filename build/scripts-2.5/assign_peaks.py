@@ -2,7 +2,7 @@
 import sys
 from datetime import datetime
 from optparse import OptionParser
-from SolexaTools.solexatools import assign_peaks
+from solexatools import assign_peaks
 
 parser = OptionParser()
 parser.add_option("-p", "--peakfile", dest="peakfile", help="Peaks in Wiggle/bed format", metavar="FILE")

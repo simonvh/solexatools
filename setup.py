@@ -11,6 +11,6 @@ setup (name = 'SolexaTools',
 		author='Simon van Heeringen',
 		author_email='s.vanheeringen@ncmls.ru.nl',
 		license='MIT',
-		packages=['SolexaTools'],
+		packages=['solexatools'],
 		scripts=['scripts/assign_peaks.py', 'scripts/peakstats.py'],
 )

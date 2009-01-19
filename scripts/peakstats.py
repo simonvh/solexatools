@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 import sys
-import re
-import os
-from numpy import max
 from optparse import OptionParser
 from solexatools import peak_stats
 from solexatools.track import SimpleTrack
@@ -27,14 +24,14 @@ peaks = SimpleTrack(peakfile)
 data = SimpleTrack(datafile)
 
 formatter = {
-	"all": all_formatter,
-	"number": number_formatter,
-	"max" : max_formatter,
-	"maxfeature": maxfeature_formatter,
-	"catch": catch_formatter,
+	"all": peak_stats.all_formatter,
+	"number": peak_stats.number_formatter,
+	"max" : peak_stats.max_formatter,
+	"maxfeature": peak_stats.maxfeature_formatter,
+	"catch": peak_stats.catch_formatter,
 }
 
-result = peakstats(peaks, data, formatter[format])
+result = peak_stats.peak_stats(peaks, data, formatter[format])
 
 if format == "catch":
 	print "Catch format currently not completely working!"
