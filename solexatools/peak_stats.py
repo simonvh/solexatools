@@ -86,7 +86,7 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
 
 		while data_feature and peak_feature and (data_feature[0] > peak_feature[0]):
 			if zeroes:	
-				ret.append(formatter(peak_feature))
+				ret.append(formatter(peak_feature, []))
 			peak_feature = peak_track.get_next_feature()
 			#print "p2:", peak_feature	
 	
