@@ -2,6 +2,7 @@
 import re
 import os
 from tempfile import NamedTemporaryFile
+from numpy import *
 
 class SimpleTrack:
 	def __init__(self, file, sorted=None):
@@ -77,3 +78,22 @@ class SimpleTrack:
 				return True
 		f.close()
 		return False
+
+class TrackStats():
+	def __init__(self, file):
+		s = SimpleTrack(file)
+		
+		values = []
+		f = s.get_next_feature()
+		while f:
+			values.append(f[3])
+			f = s.get_next_feature()
+
+		values = array(values, dtype=float)
+		self.mean = mean(values)
+		self.median = median(values)
+		self.min= min(values)
+		self.max = max(values)
+
+
+
