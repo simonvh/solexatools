@@ -6,3 +6,4 @@ SolexaTools/solexatools.py
 SolexaTools/__init__.py
 scripts/assign_peaks.py
 scripts/peakstats.py
+scripts/solexa_analysis.py
