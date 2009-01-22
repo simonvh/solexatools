@@ -2,12 +2,16 @@
 import sys
 import re
 import os
-from numpy import max
+from numpy import max,mean
 from solexatools.track import SimpleTrack
 
 def max_val(features):
 	test = map(lambda x: x[3], features)
 	return max(test)
+
+def mean_val(features):
+	test = map(lambda x: x[3], features)
+	return mean(test)
 
 def max_feature(features):
 	features.sort(cmp=lambda x,y: cmp(x[3],y[3]))
@@ -20,6 +24,12 @@ def fraction(features, f):
 def max_formatter(peak, overlap):
 	if overlap:
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], max_val(overlap))
+	else:
+		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
+
+def mean_formatter(peak, overlap):
+	if overlap:
+		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], mean_val(overlap))
 	else:
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
 

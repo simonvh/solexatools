@@ -7,7 +7,7 @@ from solexatools.track import SimpleTrack
 parser = OptionParser()
 parser.add_option("-p", "--peakfile", dest="peakfile", help="Peaks in (fixedStep) Wiggle/bed format", metavar="FILE")
 parser.add_option("-d", "--datafile", dest="datafile", help="Data in (fixedStep) Wiggle format", metavar="FILE")
-parser.add_option("-f", "--format", dest="format", help="Output format: all|number|max|maxfeature|catch", metavar="F", default="all")
+parser.add_option("-f", "--format", dest="format", help="Output format: all|number|max|mean|maxfeature|catch", metavar="F", default="all")
 parser.add_option("-z", "--zeroes", dest="zeroes", help="Pprint zeroes", action="store_true", default=False)
 
 (options, args) = parser.parse_args()
@@ -27,6 +27,7 @@ formatter = {
 	"all": peak_stats.all_formatter,
 	"number": peak_stats.number_formatter,
 	"max" : peak_stats.max_formatter,
+	"mean" : peak_stats.mean_formatter,
 	"maxfeature": peak_stats.maxfeature_formatter,
 	"catch": peak_stats.catch_formatter,
 }
