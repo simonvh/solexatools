@@ -92,8 +92,9 @@ def genes_to_promoters_and_exons(file, up, down):
 
 	return promoter, exons, location
 
-promoter, exons, location = genes_to_promoters_and_exons(options.genefile, options.upstream, options.downstream)
-
+upstream = int(options.upstream)
+downstream = int(options.downstream)
+promoter, exons, location = genes_to_promoters_and_exons(options.genefile, upstream, downstream)
 tmp = NamedTemporaryFile()
 tmpname = tmp.name
 f = open(tmpname, "w")
@@ -153,10 +154,17 @@ for row in result:
 		gene_length[gene] = int(end) - int(start)
 
 
+print "location\tgene_name\t# of tags / total_length\t# of tags in promoter\t# of tags gene body, norm to promoter\tlog2(prom/genebody)"
 for gene in prom_result.keys():
+	prom = float(prom_result[gene])
+	body = 0
+	body_norm = 0
+	ratio = "NA"
+	length = upstream
 	if gene_result.has_key(gene):
-		prom = prom_result[gene]
-		body = gene_result[gene] / float(gene_length[gene]) * (options.upstream + options.downstream)
-		print "%s\t%s\t%s\t%s\t%s" % (location[gene], gene, prom, body, log((prom + 1)/ (body + 1))/log(2) )
-	else:
-		print "%s\t%s\t%s\tnot found" % (location[gene], gene, prom_result[gene])
+		body = float(gene_result[gene])
+		body_norm = body / float(gene_length[gene]) * (upstream + downstream)
+		ratio = log((prom + 1)/ (body_norm + 1))/log(2)
+		length = gene_length[gene] + upstream	
+	print "%s\t%s\t%s\t%s\t%s\t%s" % (location[gene], gene, (prom + body) /  length , prom, body_norm, ratio )
+
