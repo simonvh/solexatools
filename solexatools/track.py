@@ -79,7 +79,7 @@ class SimpleTrack:
 		f.close()
 		return False
 
-class TrackStats():
+class TrackStats:
 	def __init__(self, file):
 		s = SimpleTrack(file)
 		
