@@ -8,7 +8,7 @@ parser = OptionParser()
 parser.add_option("-p", "--peakfile", dest="peakfile", help="Peaks in (fixedStep) Wiggle/bed format", metavar="FILE")
 parser.add_option("-d", "--datafile", dest="datafile", help="Data in (fixedStep) Wiggle format", metavar="FILE")
 parser.add_option("-f", "--format", dest="format", help="Output format: all|number|max|mean|maxfeature|catch", metavar="F", default="all")
-parser.add_option("-z", "--zeroes", dest="zeroes", help="Pprint zeroes", action="store_true", default=False)
+parser.add_option("-z", "--zeroes", dest="zeroes", help="Print zeroes", action="store_true", default=False)
 
 (options, args) = parser.parse_args()
 

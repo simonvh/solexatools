@@ -212,11 +212,11 @@ class SolexaAnalysis:
 			exp.create_wiggle(self.sum_bed, self.wig_dir)
 
 	def assign_peaks(self):
-		if not os.path.exists(self.genefile):
-			print "Genefile %s not found! Cannot assign peaks to genes." % self.genefile
-			sys.exit()
 
 		if self.do_assignpeaks:
+			if not os.path.exists(self.genefile):
+				print "Genefile %s not found! Cannot assign peaks to genes." % self.genefile
+				sys.exit()
 			for exp in self.experiments:
 				for peakfile in exp.peak_files:
 					overlap_file = peakfile.replace(".bed",  "_" + os.path.split(self.genefile)[-1])
@@ -234,11 +234,11 @@ class SolexaAnalysis:
 		s.make_bed_files()
 		s.normalize()
 		s.call_peaks()
-		s.assign_peaks()
 		s.create_wiggle()
+		s.assign_peaks()
 		
 
-if not os.path.exists("my_solex.cfg"):
+if not os.path.exists("my_solexa.cfg"):
 	print "No configuration file found!"
 	print "This script is still under development by Simon although quite usable already"
 	print "It will do some basic analyses:"
