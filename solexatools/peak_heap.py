@@ -15,32 +15,37 @@ import os
 
 MERGE = "mergebed.pl"
 
-def _make_one_peak_file(peaks, filename):
+def _make_one_peak_file(peaks, filename, merge=True):
 	temp = NamedTemporaryFile()
 	tempname = temp.name
-	
+	temp.close()
+
 	# check if all files exist
 	for peakfile in peaks:
 		if not os.path.exists(peakfile):
 			raise IOError,  "%s does not exist!" % peakfile
 	
-	# check if we can run mergebed.pl
-	if os.system("%s > /dev/null 2>&1" % MERGE):
-		raise Exceptionr,  "%s is requires to run peak_heap" % MERGE
+	if merge:
+		# check if we can run mergebed.pl
+		if os.system("%s > /dev/null 2>&1" % MERGE):
+			raise Exceptionr,  "%s is requires to run peak_heap" % MERGE
 
 	all_files = " ".join(peaks)
 	
-	command = "cat %s > %s"
+	command = "cat %s |grep -v track> %s"
 	ret = os.system(command % (all_files, tempname))
 	if ret:
 		raise Exception,  "cat didn't work"
 
-	command = "%s -i %s > %s  2>/dev/null" % (MERGE, tempname, filename)
-	ret = os.system(command)
-	if ret:
-		raise Exception, "Something went wrong running mergebed.pl"
+	if merge:
+		command = "%s -i %s > %s  2>/dev/null" % (MERGE, tempname, filename)
+		ret = os.system(command)
+		if ret:
+			raise Exception, "Something went wrong running mergebed.pl"
+	else:
+		os.rename(tempname, filename)
 
-def peak_heap(peaks, data, outdir="."):
+def peak_heap(peaks, data,merge=True):
 	""" peak_heap(peaks, data)
 			peaks: list of peakfiles in BED format
 			data: dictionary containging name, read files in BED format items
@@ -57,7 +62,7 @@ def peak_heap(peaks, data, outdir="."):
 
 	# First make one big peak file
 	peakfile = NamedTemporaryFile().name
-	_make_one_peak_file(peaks, peakfile)
+	_make_one_peak_file(peaks, peakfile, merge)
 	
 	count = {}
 	peak_track = SimpleTrack(peakfile)
