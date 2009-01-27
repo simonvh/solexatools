@@ -34,8 +34,9 @@ BUFSIZE = 10000000
 pos = {}
 
 # Read file of data points (only start & end are used)
-f = open(data_file)
-while 1:
+t = SimpleTrack(data_file)
+f = t.get_next_feature()
+while f:
 	lines = f.readlines(BUFSIZE)
 	if not lines:
 		break

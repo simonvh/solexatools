@@ -80,24 +80,26 @@ def assign_peaks(genefile, bedfile, upstream, extend):
 	str = {}
 	pos = {}
 	nme = {}
-
-	for line in open(genefile):
-		if not line.startswith("track"):
-			(chr, start, end, name, score, strand) = line[:-1].split("\t")[:6]
-			if not(pos.has_key(chr)):
-				pos[chr] = []
-				str[chr] = []
-				nme[chr] = []
-			strand= strand_map[strand]
 	
-			if strand:
-			# + strand
-				pos[chr].append([int(start) + extra, int(end)])
-			else:
-			# - strand
-				pos[chr].append([int(start), int(end) - extra])
-			str[chr].append(strand)
-			nme[chr].append(name)
+	t = SimpleTrack(genefile)
+	f = t.get_next_feature()
+	while t:
+		chr, start, end, name, strand = f
+		(chr, start, end, name, score, strand) = line[:-1].split("\t")[:6]
+		if not(pos.has_key(chr)):
+			pos[chr] = []
+			str[chr] = []
+			nme[chr] = []
+		strand= strand_map[strand]
+		if strand:
+		# + strand
+			pos[chr].append([int(start) + extra, int(end)])
+		else:
+		# - strand
+			pos[chr].append([int(start), int(end) - extra])
+		str[chr].append(strand)
+		nme[chr].append(name)
+		f = t.get_next_feature()
 
 	for chr in pos.keys():
 		pos[chr] = array(pos[chr])
@@ -106,20 +108,18 @@ def assign_peaks(genefile, bedfile, upstream, extend):
 
 	targets = {}
 	target_names = {}
-	for line in open(bedfile):
-		if not line.startswith("track"):
-			vals =  line[:-1].split("\t")
-			name = ""
-			if len(vals) > 3:
-				name = vals[3]
-			(chr, start, end) = vals[:3] 
-			if not name:
-				name = "%s:%s-%s" % (chr, start, end)
-			if not targets.has_key(chr):
-				targets[chr] = []
-				target_names[chr] = []
-			targets[chr].append([int(start),int(end)])
-			target_names[chr].append(name)
+	t = SimpleTrack(bedfile):
+	f = t.get_next_feature()
+	while f:
+		(chr, start, end, name) = f[:5] 
+		if not name:
+			name = "%s:%s-%s" % (chr, start, end)
+		if not targets.has_key(chr):
+			targets[chr] = []
+			target_names[chr] = []
+		targets[chr].append([int(start),int(end)])
+		target_names[chr].append(name)
+		f = t.get_next_feature()
 		
 	matrix = {}
 	for chr in targets.keys():

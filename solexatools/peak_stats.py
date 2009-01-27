@@ -102,17 +102,26 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
 	
 		if peak_feature:
 			while (data_feature and ((data_feature[0] < peak_feature[0]) or ((data_feature[0] == peak_feature[0]) and (data_feature[2] < peak_feature[1])))):
+				print "Neee", data_feature
 				data_feature = data_track.get_next_feature()
 				#print "d2:", data_feature	
 	
 			while (data_feature and (data_feature[1] <= peak_feature[2] and data_feature[0] == peak_feature[0])):
+				print "Hier moet ik zijn", data_feature
 				overlap.append(data_feature)
 				data_feature = data_track.get_next_feature()
 				#print "d3:", data_feature	
 
 			ret.append(formatter(peak_feature, overlap))
 		peak_feature = peak_track.get_next_feature()
+		
 		#print "p3:", peak_feature	
+		data_feature = data_track.get_previous_feature()
+		while data_feature and peak_feature and data_feature[2] >= peak_feature[1] and data_feature[0] == peak_feature[0]:
+			print "GO BACK"
+			data_feature = data_track.get_previous_feature()
+		#if not data_feature:
+		#	data_feature = data_track.get_next_feature()
 
 	return ret
 
