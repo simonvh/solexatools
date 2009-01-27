@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from numpy import *
+from solexatools.track import SimpleTrack
 
 def get_minimum_distance(a, b):
 	# assign_peaks
@@ -83,9 +84,8 @@ def assign_peaks(genefile, bedfile, upstream, extend):
 	
 	t = SimpleTrack(genefile)
 	f = t.get_next_feature()
-	while t:
+	while f:
 		chr, start, end, name, strand = f
-		(chr, start, end, name, score, strand) = line[:-1].split("\t")[:6]
 		if not(pos.has_key(chr)):
 			pos[chr] = []
 			str[chr] = []
@@ -108,10 +108,10 @@ def assign_peaks(genefile, bedfile, upstream, extend):
 
 	targets = {}
 	target_names = {}
-	t = SimpleTrack(bedfile):
+	t = SimpleTrack(bedfile)
 	f = t.get_next_feature()
 	while f:
-		(chr, start, end, name) = f[:5] 
+		(chr, start, end, name) = f[:4] 
 		if not name:
 			name = "%s:%s-%s" % (chr, start, end)
 		if not targets.has_key(chr):

@@ -142,7 +142,8 @@ class SimpleTrack:
 						value = float(vals[3])
 					except:
 						value = vals[3]
-					#strand = vals[5]	
+					if len(vals) >= 5:
+						strand = vals[5]	
 			return (vals[0], start, end, value, strand)
 
 	def is_fixedstep(self,file):
