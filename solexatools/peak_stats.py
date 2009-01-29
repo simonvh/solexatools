@@ -39,6 +39,9 @@ def maxfeature_formatter(peak, overlap):
 def number_formatter(peak, overlap):
     return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], len(overlap))
 
+def tuple_number_formatter(peak, overlap):
+    return (peak[0], peak[1], peak[2], len(overlap))
+
 def all_formatter(peak, overlap):
 	return "\n".join("%s\t%s\t%s\t%s" % x[:4] for x in overlap)
 

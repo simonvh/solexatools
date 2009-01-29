@@ -33,8 +33,9 @@ class SimpleTrack:
 		self.line_index.append(self.fh.tell())
 		if mem:
 			self.lines = self.fh.readlines()
+			self.number_of_lines = len(self.lines)
 		else:
-			self.lines = self.fh.readlines(self.BUFSIZE)
+			self.readlines()
 		self.index = 0
 
 	def guess_format(self, file):
@@ -75,15 +76,19 @@ class SimpleTrack:
 		os.system("sort -k1,1 -k2g,2 %s > %s" % (file, tempname))
 		return temp
 
+	def readlines(self):
+		self.lines = self.fh.readlines(self.BUFSIZE)
+		self.number_of_lines = len(self.lines)
+
 	def readline(self):
 		#make use of a buffer to speed up the reading of a file
-		if len(self.lines) and self.index < len(self.lines):
+		if self.lines and self.index < len(self.lines):
 			self.index += 1
 			return self.lines[self.index - 1]
 		else:
 			ind = self.fh.tell()
-			self.lines = self.fh.readlines(self.BUFSIZE)
-			if not len(self.lines):
+			self.readlines()
+			if not self.lines:
 				self.eof = True
 				return None
 			self.line_index.append(ind)
@@ -96,8 +101,8 @@ class SimpleTrack:
 		self.index -= 2
 		if self.eof:
 			self.fh.seek(self.line_index[-1])
-			self.lines = self.fh.readlines(self.BUFSIZE)
-			self.index = len(self.lines) - 1
+			self.readlines()
+			self.index = self.number_of_lines - 1
 			self.eof = False
 		if self.index < 0 :
 			if len(self.line_index) == 1:
@@ -105,8 +110,8 @@ class SimpleTrack:
 				return None
 			del self.line_index[-1]
 			self.fh.seek(self.line_index[-1])
-			self.lines = self.fh.readlines(self.BUFSIZE)
-			self.index = len(self.lines) - 1
+			self.readlines()
+			self.index = self.number_of_lines - 1
 		return self.get_next_feature()
 	
 	def get_next_feature(self):
