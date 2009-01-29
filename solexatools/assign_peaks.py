@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from numpy import *
-from solexatools.track import SimpleTrack
+from solexatools.track import * 
 
 def get_minimum_distance(a, b):
 	# assign_peaks
