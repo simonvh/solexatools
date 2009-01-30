@@ -23,6 +23,9 @@ if not genefile or not bedfile:
 	parser.print_help()
 	sys.exit(0)
 
+if upstream < extend:
+	print "WARNING: %s is smaller than %s. I suspect the output will be wrong, haven't fixed it yet" % (options.upstream, options.extend)
+
 print "#assign_peaks.py %s" % (datetime.today().strftime("%d-%m-%Y %H:%M"))
 print "#peaks: %s" % bedfile
 print "#targets: %s" % genefile
@@ -53,6 +56,10 @@ if overview:
 		for name in names:
 			str += "\t"  + (",".join(cat[name]))
 		print str
+elif printlist:
+	#cat = {"in_gene":[], "upstream"[], "close":[]}
+	#for gene,targets in matrix.items():
+	pass
 else:
 	for gene, target in matrix.items():
 		for (chr, middle, target, val) in target:
