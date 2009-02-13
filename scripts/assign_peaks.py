@@ -30,7 +30,8 @@ print "#assign_peaks.py %s" % (datetime.today().strftime("%d-%m-%Y %H:%M"))
 print "#peaks: %s" % bedfile
 print "#targets: %s" % genefile
 print "#extension: %s maximum upstream: %s" % (extend, upstream) 
-
+print "#Warning: output format has changed! (06-02-2009)" 
+sys.stderr.write("Warning: output format has changed! (06-02-2009)\n")
 matrix = assign_peaks(genefile, bedfile, upstream, extend)
 if overview:
 	names = ["prox_upstream","downstream","in_gene","upstream"]
@@ -40,14 +41,14 @@ if overview:
 	print str
 	for gene,targets in matrix.items():
 		cat = {"prox_upstream":[], "downstream":[], "in_gene":[], "upstream":[]}
-		for (chr, middle, target, val) in targets:
-			if val < 0:
+		for (chr, start, end, val, dist) in targets:
+			if dist < 0:
 				cat["downstream"].append(target)
-			elif val == 0:
+			elif dist == 0:
 				cat["in_gene"].append(target)
-			elif val <= extend:
+			elif dist <= extend:
 				cat["prox_upstream"].append(target)
-			elif val > extend:
+			elif dist > extend:
 				cat["upstream"].append(target)
 			else:
 				raise ShouldNotHappenError
@@ -56,11 +57,11 @@ if overview:
 		for name in names:
 			str += "\t"  + (",".join(cat[name]))
 		print str
-elif printlist:
+#elif printlist:
 	#cat = {"in_gene":[], "upstream"[], "close":[]}
 	#for gene,targets in matrix.items():
-	pass
+#	pass
 else:
 	for gene, target in matrix.items():
-		for (chr, middle, target, val) in target:
-			print "%s\t%s\t%s\t%s\t%s" % (gene, chr, middle, target, val)
+		for (chr, start, end, target, val) in target:
+			print "%s\t%s:%s-%s\t%s\t%s" % (gene, chr, start, end, target, val)

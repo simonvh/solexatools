@@ -126,6 +126,8 @@ def assign_peaks(genefile, bedfile, upstream, extend):
 		if pos.has_key(chr):
 			t_all = array(targets[chr])
 			t_middle = (t_all[:,0] + t_all[:,1]) / 2
+			t_start = t_all[:,0] 
+			t_end = t_all[:,1]
 			#print t_middle
 			tn = array(target_names[chr])
 	
@@ -136,5 +138,5 @@ def assign_peaks(genefile, bedfile, upstream, extend):
 			for target_id,row in enumerate(get_overlap(t_all, pos[chr], str[chr], extend)):
 				for gene_id, val in enumerate(row):
 					if val >= -extend and val < upstream:
-						matrix.setdefault(nme[chr][gene_id], []).append( [chr, t_middle[target_id], tn[target_id], val])
+						matrix.setdefault(nme[chr][gene_id], []).append( [chr, t_start[target_id], t_end[target_id], tn[target_id], val])
 	return matrix

@@ -154,17 +154,20 @@ for row in result:
 		gene_length[gene] = int(end) - int(start)
 
 
-print "location\tgene_name\t# of tags / total_length\t# of tags in promoter\t# of tags gene body, norm to promoter\tlog2(prom/genebody)"
+print "location\tgene_name\t# of tags / total_length\t# of tags in promoter\t# of tags gene body, norm to promoter\tlog2(prom/genebody)\tlength body/prom"
 for gene in prom_result.keys():
 	prom = float(prom_result[gene])
 	body = 0
 	body_norm = 0
 	ratio = "NA"
 	length = upstream
+	rel_length = "NA"
 	if gene_result.has_key(gene):
 		body = float(gene_result[gene])
 		body_norm = body / float(gene_length[gene]) * (upstream + downstream)
+		#body_norm = body 
 		ratio = log((prom + 1)/ (body_norm + 1))/log(2)
 		length = gene_length[gene] + upstream	
-	print "%s\t%s\t%s\t%s\t%s\t%s" % (location[gene], gene, (prom + body) /  length , prom, body_norm, ratio )
+		rel_length = (gene_length[gene] - downstream) / (upstream + downstream)
+	print "%s\t%s\t%s\t%s\t%s\t%s\t%s" % (location[gene], gene, (prom + body) /  length , prom, body_norm, ratio, rel_length )
 
