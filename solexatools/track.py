@@ -161,6 +161,38 @@ class SimpleTrack:
 		f.close()
 		return False
 
+class ExonTrack:
+	def __init__(self, file):
+			""" Reads a GTF file of exons"""	
+			self.exons = {}
+			self.chr = {}
+			self.strand = {}
+			
+			# gene_id "NM_001005484"; transcript_id "NM_001005484"; 
+			p = re.compile(r'(gene|transcript_id) "([^"]+)"')
+			
+			for line in open(file):
+				vals = line[:-1].split("\t")
+				name = p.search(vals[8]).group(2)
+
+				self.chr[name] = vals[0]
+				self.strand[name] = vals[6]
+				if self.exons.has_key(name):
+					self.exons[name].append((int(vals[3]), int(vals[4])))
+				else:
+					self.exons[name] = [(int(vals[3]), int(vals[4]))]
+			
+			# sort all exons based on start position
+			for name in self.exons.keys():
+				self.exons[name].sort(lambda x,y: x[0] - y[0])
+	
+	def get_exons(self):
+		t = []
+		for name in self.exons.keys():
+			for exon in self.exons[name]:
+				t.append((self.chr[name], exon[0], exon[1], name))
+		return t
+
 class TrackStats:
 	def __init__(self, file):
 		s = SimpleTrack(file)
@@ -178,4 +210,8 @@ class TrackStats:
 		self.max = max(values)
 
 
-
+if __name__ == "__main__":
+	t = ExonTrack("test.gtf")
+	for name in t.exons.keys():
+		print name, t.exons[name]
+	print t.get_exons()

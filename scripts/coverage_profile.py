@@ -2,6 +2,7 @@
 from numpy import *
 import sys
 from optparse import OptionParser,TitledHelpFormatter
+from solexatools.track import *
 
 VERSION = "1.0"
 
@@ -37,15 +38,10 @@ pos = {}
 t = SimpleTrack(data_file)
 f = t.get_next_feature()
 while f:
-	lines = f.readlines(BUFSIZE)
-	if not lines:
-		break
-	for line in lines:
-		vals = line[:-1].split("\t")
-		if not(pos.has_key(vals[0])):
-			pos[vals[0]] = []
-		pos[vals[0]].append([int(vals[1]),int(vals[2])])
-f.close()
+	if not(pos.has_key(f[0])):
+		pos[f[0]] = []
+	pos[f[0]].append([f[1],f[2]])
+	f = t.get_next_feature()
 
 # Transform lists to Numpy arrays
 for chr in pos.keys():
