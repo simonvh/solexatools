@@ -95,27 +95,50 @@ class SimpleTrack:
 			self.index = 1
 			return self.lines[0]
 
-	def get_previous_feature(self):
-		if self.index == 1 and len(self.line_index) == 1:
-			return None
-		self.index -= 2
-		if self.eof:
-			self.fh.seek(self.line_index[-1])
-			self.readlines()
-			self.index = self.number_of_lines - 1
-			self.eof = False
+	def index_min_1(self):
+		self.index -= 1
+
 		if self.index < 0 :
 			if len(self.line_index) == 1:
-				self.index += 2
+				self.index += 1
 				return None
 			del self.line_index[-1]
 			self.fh.seek(self.line_index[-1])
 			self.readlines()
 			self.index = self.number_of_lines - 1
+
+
+	def get_previous_feature(self):
+		if self.index == 1 and len(self.line_index) == 1:
+			return None
+	
+		if self.fixed and self.index == 2 and len(self.line_index) == 1:
+			return None
+
+		self.index_min_1()
+		self.index_min_1()
+		
+		if self.fixed:
+			if self.lines[self.index].startswith("fixed"):
+				self.index_min_1()
+			target = self.index
+			while not self.lines[self.index].startswith("fixed"):
+				self.index_min_1()
+			self.index_min_1()
+			
+			for i in range(target - self.index - 1):
+				self.get_next_feature()
+		
+		if self.eof:
+			self.fh.seek(self.line_index[-1])
+			self.readlines()
+			self.index = self.number_of_lines - 1
+			self.eof = False
 		return self.get_next_feature()
 	
 	def get_next_feature(self):
 		line = self.readline()
+		#print line
 		while (line and (line[0] == "#" or line.startswith("track"))):
 			line = self.readline()
 		if not(line):

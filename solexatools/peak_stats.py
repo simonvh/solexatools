@@ -34,8 +34,11 @@ def mean_formatter(peak, overlap):
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
 
 def maxfeature_formatter(peak, overlap):
-	return "\t".join([str(x) for x in max_feature(overlap)])
-
+	if overlap:
+		return "\t".join([str(x) for x in max_feature(overlap)])
+	else:
+		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
+		
 def number_formatter(peak, overlap):
     return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], len(overlap))
 
@@ -96,35 +99,39 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
 	prev_data_seq = ""
 	while peak_feature:
 		overlap = []
-
+		
 		while data_feature and peak_feature and (data_feature[0] > peak_feature[0]):
+			print data_feature, peak_feature
 			if zeroes:	
 				ret.append(formatter(peak_feature, []))
 			peak_feature = peak_track.get_next_feature()
-			#print "p2:", peak_feature	
+			print "p2:", peak_feature	
 	
 		if peak_feature:
 			while (data_feature and ((data_feature[0] < peak_feature[0]) or ((data_feature[0] == peak_feature[0]) and (data_feature[2] < peak_feature[1])))):
-				#print "Neee", data_feature
+#				print "Neee", data_feature
 				data_feature = data_track.get_next_feature()
-				#print "d2:", data_feature	
+#				print "d2:", data_feature	
 	
 			while (data_feature and (data_feature[1] <= peak_feature[2] and data_feature[0] == peak_feature[0])):
-				#print "Hier moet ik zijn", data_feature
+#				print "Hier moet ik zijn", data_feature
 				overlap.append(data_feature)
 				data_feature = data_track.get_next_feature()
 				#print "d3:", data_feature	
 
-			ret.append(formatter(peak_feature, overlap))
+			if len(overlap) > 0:
+				ret.append(formatter(peak_feature, overlap))
+			else:	
+				sys.stderr.write("NO OVERLAP: %s\t%s\t%s\n" % peak_feature[:3])
 		peak_feature = peak_track.get_next_feature()
 		
 		#print "p3:", peak_feature	
 		data_feature = data_track.get_previous_feature()
-		while data_feature and peak_feature and data_feature[2] >= peak_feature[1] and data_feature[0] == peak_feature[0]:
-			#print "GO BACK"
+		while data_feature and peak_feature and ((data_feature[2] >= peak_feature[1] and data_feature[0] == peak_feature[0]) or data_feature[0] > peak_feature[0]):
+			#print "GO BACK peak", peak_feature, " data", data_feature
 			data_feature = data_track.get_previous_feature()
-		#if not data_feature:
-		#	data_feature = data_track.get_next_feature()
+		if not data_feature:
+			data_feature = data_track.get_next_feature()
 
 	return ret
 
