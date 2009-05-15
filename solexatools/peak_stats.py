@@ -122,7 +122,9 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
 			if len(overlap) > 0:
 				ret.append(formatter(peak_feature, overlap))
 			else:	
-				sys.stderr.write("NO OVERLAP: %s\t%s\t%s\n" % peak_feature[:3])
+				if zeroes:
+					ret.append(formatter(peak_feature, []))
+				#sys.stderr.write("NO OVERLAP: %s\t%s\t%s\n" % peak_feature[:3])
 		peak_feature = peak_track.get_next_feature()
 		
 		#print "p3:", peak_feature	

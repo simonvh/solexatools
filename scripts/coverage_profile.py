@@ -40,7 +40,7 @@ f = t.get_next_feature()
 while f:
 	if not(pos.has_key(f[0])):
 		pos[f[0]] = []
-	pos[f[0]].append([f[1],f[2]])
+	pos[f[0]].append([f[1],f[2] + 1])
 	f = t.get_next_feature()
 
 # Transform lists to Numpy arrays
@@ -104,7 +104,7 @@ pos = -window
 for i in range(len(result[0])):
 	d = result[:,i]
 	#print "%s\t%0.2f\t%0.2f\t%0.2f\t%s" % (pos, mean(d), std(d), median(d), len(d))
-	print "%s\t%0.2f" % (pos, mean(d))
+	print "%s\t%0.2e" % (pos, mean(d))
 	pos += bin
 
 #for mean_val, median_val in zip(result.mean(0), median(result)):

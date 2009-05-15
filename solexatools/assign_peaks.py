@@ -105,7 +105,6 @@ def assign_peaks(genefile, bedfile, upstream, extend):
 		pos[chr] = array(pos[chr])
 		str[chr] = array(str[chr])
 		nme[chr] = array(nme[chr])
-
 	targets = {}
 	target_names = {}
 	t = SimpleTrack(bedfile)
