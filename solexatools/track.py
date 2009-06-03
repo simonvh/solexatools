@@ -15,7 +15,7 @@ class SimpleTrackIterator:
 
 
 class SimpleTrack:
-	def __init__(self, file, mem=False, sorted=None):
+	def __init__(self, file, mem=False, sorted=False):
 		self.BUFSIZE = 100000
 		self.format = self.guess_format(file)
 		self.fixed = self.is_fixedstep(file)

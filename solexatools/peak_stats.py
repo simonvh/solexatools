@@ -48,6 +48,12 @@ def tuple_number_formatter(peak, overlap):
 def all_formatter(peak, overlap):
 	return "\n".join("%s\t%s\t%s\t%s" % x[:4] for x in overlap)
 
+def tuple_all_formatter(peak, overlap):
+	if overlap:
+		return ["%s\t%s\t%s\t%s" % x[:4] for x in overlap]
+	else:
+		return []
+
 CATCH_SPACING = 10
 def catch_formatter(peak, overlap):
 	rstr = "# %s:%s-%s" % peak[0:3]
@@ -101,11 +107,11 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
 		overlap = []
 		
 		while data_feature and peak_feature and (data_feature[0] > peak_feature[0]):
-			print data_feature, peak_feature
+			#print data_feature, peak_feature
 			if zeroes:	
 				ret.append(formatter(peak_feature, []))
 			peak_feature = peak_track.get_next_feature()
-			print "p2:", peak_feature	
+			#print "p2:", peak_feature	
 	
 		if peak_feature:
 			while (data_feature and ((data_feature[0] < peak_feature[0]) or ((data_feature[0] == peak_feature[0]) and (data_feature[2] < peak_feature[1])))):
