@@ -121,6 +121,7 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
 	
 			while (data_feature and (data_feature[1] <= peak_feature[2] and data_feature[0] == peak_feature[0])):
 #				print "Hier moet ik zijn", data_feature
+				#print "Adding %s" % str(data_feature)
 				overlap.append(data_feature)
 				data_feature = data_track.get_next_feature()
 				#print "d3:", data_feature	
@@ -132,14 +133,19 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
 					ret.append(formatter(peak_feature, []))
 				#sys.stderr.write("NO OVERLAP: %s\t%s\t%s\n" % peak_feature[:3])
 		peak_feature = peak_track.get_next_feature()
-		
 		#print "p3:", peak_feature	
 		data_feature = data_track.get_previous_feature()
 		while data_feature and peak_feature and ((data_feature[2] >= peak_feature[1] and data_feature[0] == peak_feature[0]) or data_feature[0] > peak_feature[0]):
 			#print "GO BACK peak", peak_feature, " data", data_feature
 			data_feature = data_track.get_previous_feature()
+		
+		#print "This is where we are: %s" % str(data_feature)
+		if data_feature:
+			data_feature = data_track.get_previous_feature()
+		
+		#print "This is where we are: %s" % str(data_feature)
 		if not data_feature:
 			data_feature = data_track.get_next_feature()
-
+		#print "This is where we are: %s" % str(data_feature)
 	return ret
 

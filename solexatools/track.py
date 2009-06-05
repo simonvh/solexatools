@@ -109,7 +109,8 @@ class SimpleTrack:
 
 
 	def get_previous_feature(self):
-		if self.index == 1 and len(self.line_index) == 1:
+		if self.index <= 1 and len(self.line_index) <= 1:
+			self.index_min_1()
 			return None
 	
 		if self.fixed and self.index == 2 and len(self.line_index) == 1:
