@@ -3,6 +3,7 @@ import sys
 from optparse import OptionParser
 from solexatools import peak_stats
 from solexatools.track import SimpleTrack
+from os.path import basename,splitext
 
 parser = OptionParser()
 parser.add_option("-p", "--peakfile", dest="peakfile", help="Peaks in (fixedStep) Wiggle/bed format", metavar="FILE")
@@ -35,7 +36,9 @@ formatter = {
 result = peak_stats.peak_stats(peaks, data, formatter[format])
 
 if format == "catch":
-	print "Catch format currently not completely working!"
+	name = splitext(basename(datafile))[0]
+	print "## %s" % name
+	print "## %s" % name
 
 for row in result:
 	print row

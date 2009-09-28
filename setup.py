@@ -18,6 +18,7 @@ setup (name = 'SolexaTools',
 			'scripts/peak_heap.py', 
 			'scripts/solexa_analysis.py',
 			'scripts/coverage_profile.py',
+			'scripts/other_profile.py',
 			'scripts/polII_index.py',
 			],
 )

@@ -54,38 +54,43 @@ def tuple_all_formatter(peak, overlap):
 	else:
 		return []
 
+def peak_and_tuple_all_formatter(peak, overlap):
+	if overlap:
+		return peak, ["%s\t%s\t%s\t%s" % x[:4] for x in overlap]
+	else:
+		return peak, []
 CATCH_SPACING = 10
 def catch_formatter(peak, overlap):
 	rstr = "# %s:%s-%s" % peak[0:3]
 	#print peak, overlap
 	if overlap:
 		# left boundary
-		first = overlap.pop()
+		first = overlap[0]
 		#print "FIRST!", first
 		if first[1] > peak[1] + CATCH_SPACING:
 			rstr = "\n".join([rstr, "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[1] + CATCH_SPACING, 0)])
 		else:
 			rstr = "\n".join([rstr, "%s\t%s\t%s\t%s" % (peak[0], peak[1], first[2], first[3])])
 		
-		last = first[2]
-		for f in overlap[:-1]:
-			if f[1] > last + CATCH_SPACING:
-				rstr += "\n%s\t%s\t%s\t%s" % (peake[0], last, last + CATCH_SPACING, 0)
-			if f[1] >= last + CATCH_SPACING * 3:
+		last = first
+		for f in overlap[1:-1]:
+			if f[1] > last[2] + CATCH_SPACING:
+				rstr += "\n%s\t%s\t%s\t%s" % (peak[0], last[2], last[2] + CATCH_SPACING, 0)
+			if f[1] >= last[2] + CATCH_SPACING * 3:
 				rstr += "\n%s\t%s\t%s\t%s" % (peak[0], f[1] - CATCH_SPACING, f[1], 0)
-			rstr += "\n" + "\t".join(map(str, f))
+			rstr += "\n" + "\t".join(map(str, f[:4]))
 			last = f
 
 		if len(overlap) > 0 :
 			f = overlap[-1]
-			rstr += "\n" + "\t".join(map(str, f))
-			if f[2] > peak[2] - CATCH_SPACING:
-				 rstr += "\n%s\t%s\t%s\t%s" % (peak[0], f[1], peak[2], f[3])
-			else: 
-				if f[2] <= peak[2] - CATCH_SPACING * 3:
-					rstr += "\n%s\t%s\t%s\t%s" % (peak[0], f[2], f[2] + CATCH_SPACING, 0)
-				if f[2] < peak[2]:
-					rstr += "\n%s\t%s\t%s\t%s" % (peak[0], peak[2] - CATCH_SPACING, peak[2], 0)
+			if f[2] > peak[2]:
+				rstr += "\n%s\t%s\t%s\t%s" % (peak[0], f[1], peak[2], f[3])
+			elif f[2] <= peak[2] - CATCH_SPACING:
+				rstr += "\n%s\t%s\t%s\t%s" % (peak[0], f[1], f[2], f[3])
+				rstr += "\n%s\t%s\t%s\t%s" % (peak[0], f[2], f[2] + CATCH_SPACING, 0)
+			elif f[2] < peak[2]:
+				rstr += "\n%s\t%s\t%s\t%s" % (peak[0], f[1], f[2], f[3])
+				rstr += "\n%s\t%s\t%s\t%s" % (peak[0], f[2], peak[2], 0)
 	
 	else:
 		rstr = "\n".join([rstr, "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[1] + CATCH_SPACING, 0)])
@@ -149,3 +154,51 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
 		#print "This is where we are: %s" % str(data_feature)
 	return ret
 
+def binned_peak_stats(peak_track, data_track, window, binsize, formatter=number_formatter, zeroes=True):
+	ret = []
+	peak_feature = peak_track.get_next_feature()
+	#print "p1:", peak_feature	
+	data_feature = None
+	data_feature = data_track.get_next_feature()
+	#print "d1:", data_feature	
+
+	prev_data_seq = ""
+	overlap = {}
+	for bin in range(-window, window, binsize):
+		overlap[bin] = []
+		
+	while peak_feature:
+		chr = peak_feature[0]
+		start = (peak_feature[1] + peak_feature[2]) / 2 + bin
+		while data_feature and ((data_feature[2] >= start and data_feature[0] == chr) or data_feature[0] > chr):
+			data_feature = data_track.get_previous_feature()
+		if not data_feature:
+			data_feature = data_track.get_next_feature()
+		for bin in range(-window, window, binsize):
+			start = (peak_feature[1] + peak_feature[2]) / 2 + bin
+			end = start + binsize - 1 
+
+			while (data_feature and ((data_feature[0] < chr) or ((data_feature[0] == chr) and (data_feature[2] < start)))):
+				data_feature = data_track.get_next_feature()
+	
+			#if not data_feature or data_feature[1] > end or data_feature[0] != chr:
+			#	overlap[bin].append(0)
+			#else:
+			while (data_feature and (data_feature[1] <= end and data_feature[0] == chr)):
+				
+				if  peak_feature[4] == "+":
+					overlap[bin].append(data_feature[3])
+					#print data_feature, "in bin", bin
+				else:
+					overlap[-bin - binsize].append(data_feature[3])
+					#print data_feature, "in bin", -bin -binsize
+					
+				data_feature = data_track.get_next_feature()
+
+			
+		peak_feature = peak_track.get_next_feature()
+	ret = []
+	for bin in range(-window, window, binsize):
+		#print overlap[bin]
+		ret.append([bin, mean(overlap[bin])])
+	return ret
