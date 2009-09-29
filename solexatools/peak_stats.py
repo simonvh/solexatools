@@ -67,7 +67,11 @@ def bin_formatter(peak, overlap, options={"bins":10}):
 	
 
 	for feature in overlap:
-		for i in range((feature[1] - peak[1]) / l, (feature[2] - peak[1]) / l):
+		m = feature[2]
+		if feature[2] > peak[2]:
+			m = peak[2]
+
+		for i in range((feature[1] - peak[1]) / l, (m - peak[1]) / l):
 			#print i
 			bins[i] += 1	
 
