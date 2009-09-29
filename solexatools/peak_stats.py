@@ -21,44 +21,60 @@ def fraction(features, f):
 	m = max_val(features)
 	return filter(lambda x:x[3] >= f * m, features)
 
-def max_formatter(peak, overlap):
+def max_formatter(peak, overlap, options={}):
 	if overlap:
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], max_val(overlap))
 	else:
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
 
-def mean_formatter(peak, overlap):
+def mean_formatter(peak, overlap, options={}):
 	if overlap:
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], mean_val(overlap))
 	else:
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
 
-def maxfeature_formatter(peak, overlap):
+def maxfeature_formatter(peak, overlap, options={}):
 	if overlap:
 		return "\t".join([str(x) for x in max_feature(overlap)])
 	else:
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
 		
-def number_formatter(peak, overlap):
+def number_formatter(peak, overlap, options={}):
     return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], len(overlap))
 
-def tuple_number_formatter(peak, overlap):
+def tuple_number_formatter(peak, overlap, options={}):
     return (peak[0], peak[1], peak[2], len(overlap))
 
-def all_formatter(peak, overlap):
+def all_formatter(peak, overlap, options={}):
 	return "\n".join("%s\t%s\t%s\t%s" % x[:4] for x in overlap)
 
-def tuple_all_formatter(peak, overlap):
+def tuple_all_formatter(peak, overlap, options={}):
 	if overlap:
 		return ["%s\t%s\t%s\t%s" % x[:4] for x in overlap]
 	else:
 		return []
 
-def peak_and_tuple_all_formatter(peak, overlap):
+def peak_and_tuple_all_formatter(peak, overlap, options={}):
 	if overlap:
 		return peak, ["%s\t%s\t%s\t%s" % x[:4] for x in overlap]
 	else:
 		return peak, []
+
+def bin_formatter(peak, overlap, options={"bins":10}):
+	nr_bins = options["bins"]
+	l = (peak[2] - peak[1]) / nr_bins
+	bins = [0] * nr_bins
+	
+
+	for feature in overlap:
+		for i in range((feature[1] - peak[1]) / l, (feature[2] - peak[1]) / l):
+			#print i
+			bins[i] += 1	
+
+	return "%s\t%s\t%s\t" % (peak[0], peak[1], peak[2]) + "\t".join([str(x) for x in bins])
+
+
+
 CATCH_SPACING = 10
 def catch_formatter(peak, overlap):
 	rstr = "# %s:%s-%s" % peak[0:3]
@@ -98,8 +114,7 @@ def catch_formatter(peak, overlap):
 	return rstr
 
 
-
-def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
+def peak_stats(peak_track, data_track, formatter=number_formatter, formatter_options={}, zeroes=True):
 	ret = []
 	peak_feature = peak_track.get_next_feature()
 	#print "p1:", peak_feature	
@@ -114,7 +129,7 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
 		while data_feature and peak_feature and (data_feature[0] > peak_feature[0]):
 			#print data_feature, peak_feature
 			if zeroes:	
-				ret.append(formatter(peak_feature, []))
+				ret.append(formatter(peak_feature, [], formatter_options))
 			peak_feature = peak_track.get_next_feature()
 			#print "p2:", peak_feature	
 	
@@ -132,10 +147,10 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, zeroes=True):
 				#print "d3:", data_feature	
 
 			if len(overlap) > 0:
-				ret.append(formatter(peak_feature, overlap))
+				ret.append(formatter(peak_feature, overlap, formatter_options))
 			else:	
 				if zeroes:
-					ret.append(formatter(peak_feature, []))
+					ret.append(formatter(peak_feature, [], formatter_options))
 				#sys.stderr.write("NO OVERLAP: %s\t%s\t%s\n" % peak_feature[:3])
 		peak_feature = peak_track.get_next_feature()
 		#print "p3:", peak_feature	

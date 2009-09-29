@@ -30,10 +30,13 @@ formatter = {
 	"max" : peak_stats.max_formatter,
 	"mean" : peak_stats.mean_formatter,
 	"maxfeature": peak_stats.maxfeature_formatter,
+	"window": peak_stats.bin_formatter,
 	"catch": peak_stats.catch_formatter,
 }
 
-result = peak_stats.peak_stats(peaks, data, formatter[format])
+options = {"bins":10}
+
+result = peak_stats.peak_stats(peaks, data, formatter[format], options)
 
 if format == "catch":
 	name = splitext(basename(datafile))[0]
