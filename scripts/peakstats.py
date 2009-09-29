@@ -10,6 +10,7 @@ parser.add_option("-p", "--peakfile", dest="peakfile", help="Peaks in (fixedStep
 parser.add_option("-d", "--datafile", dest="datafile", help="Data in (fixedStep) Wiggle format", metavar="FILE")
 parser.add_option("-f", "--format", dest="format", help="Output format: all|number|max|mean|maxfeature|catch", metavar="F", default="all")
 parser.add_option("-z", "--zeroes", dest="zeroes", help="Print zeroes", action="store_true", default=False)
+parser.add_option("-b", "--bins", dest="bins", help="Number of bins (don't use this option for now)", type="int", default=10)
 
 (options, args) = parser.parse_args()
 
@@ -34,9 +35,9 @@ formatter = {
 	"catch": peak_stats.catch_formatter,
 }
 
-options = {"bins":10}
+formatter_options = {"bins":options.bins}
 
-result = peak_stats.peak_stats(peaks, data, formatter[format], options)
+result = peak_stats.peak_stats(peaks, data, formatter[format], formatter_options)
 
 if format == "catch":
 	name = splitext(basename(datafile))[0]
