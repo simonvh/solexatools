@@ -62,7 +62,7 @@ def peak_and_tuple_all_formatter(peak, overlap, options={}):
 
 def bin_formatter(peak, overlap, options={"bins":10}):
 	nr_bins = options["bins"]
-	l = (peak[2] - peak[1]) / nr_bins
+	l = (peak[2] - peak[1] + 1) / nr_bins
 	bins = [0] * nr_bins
 	
 
