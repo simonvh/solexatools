@@ -77,8 +77,13 @@ class SimpleTrack:
 		return temp
 
 	def readlines(self):
-		self.lines = self.fh.readlines(self.BUFSIZE)
-		self.number_of_lines = len(self.lines)
+		lines = self.fh.readlines(self.BUFSIZE)
+		if lines:
+			self.lines = lines 
+			self.number_of_lines = len(self.lines)
+		else:
+			self.eof = True
+		
 
 	def readline(self):
 		#make use of a buffer to speed up the reading of a file
@@ -88,8 +93,7 @@ class SimpleTrack:
 		else:
 			ind = self.fh.tell()
 			self.readlines()
-			if not self.lines:
-				self.eof = True
+			if self.eof:
 				return None
 			self.line_index.append(ind)
 			self.index = 1
@@ -109,6 +113,7 @@ class SimpleTrack:
 
 
 	def get_previous_feature(self):
+		#print "index", self.index
 		if self.index <= 1 and len(self.line_index) <= 1:
 			self.index_min_1()
 			return None
@@ -117,29 +122,39 @@ class SimpleTrack:
 			return None
 
 		self.index_min_1()
-		self.index_min_1()
-		
+		if not self.eof:
+			self.index_min_1()
+		#print "index", self.index
+		#print "len", len(self.lines)
 		if self.fixed:
+			#print "Fixed!"
 			if self.lines[self.index].startswith("fixed"):
+				#print "min 1"
 				self.index_min_1()
 			target = self.index
+			
+			if self.index == 0:
+				return None
 			while not self.lines[self.index].startswith("fixed"):
+				#print "while - 1, index", self.index
 				self.index_min_1()
+			#print "extra - 1"
 			self.index_min_1()
 			
-			for i in range(target - self.index - 1):
+			for i in range(target - self.index - 2):
 				self.get_next_feature()
 		
-		if self.eof:
-			self.fh.seek(self.line_index[-1])
-			self.readlines()
-			self.index = self.number_of_lines - 1
-			self.eof = False
+		#if self.eof:
+		#	self.fh.seek(self.line_index[-1])
+		#	self.readlines()
+		#	self.index = self.number_of_lines - 1
+		self.eof = False
 		return self.get_next_feature()
 	
 	def get_next_feature(self):
 		line = self.readline()
 		#print line
+		
 		while (line and (line[0] == "#" or line.startswith("track"))):
 			line = self.readline()
 		if not(line):
@@ -173,6 +188,7 @@ class SimpleTrack:
 						value = vals[3]
 					if len(vals) > 5:
 						strand = vals[5]	
+			#print self.index,  (vals[0], start, end, value, strand)
 			return (vals[0], start, end, value, strand)
 
 	def is_fixedstep(self,file):

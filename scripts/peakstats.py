@@ -5,12 +5,14 @@ from solexatools import peak_stats
 from solexatools.track import SimpleTrack
 from os.path import basename,splitext
 
+DEFAULT_BINS=10
+
 parser = OptionParser()
 parser.add_option("-p", "--peakfile", dest="peakfile", help="Peaks in (fixedStep) Wiggle/bed format", metavar="FILE")
 parser.add_option("-d", "--datafile", dest="datafile", help="Data in (fixedStep) Wiggle format", metavar="FILE")
-parser.add_option("-f", "--format", dest="format", help="Output format: all|number|max|mean|maxfeature|catch", metavar="F", default="all")
+parser.add_option("-f", "--format", dest="format", help="Output format: all|number|max|mean|maxfeature|catch|window", metavar="F", default="all")
 parser.add_option("-z", "--zeroes", dest="zeroes", help="Print zeroes", action="store_true", default=False)
-parser.add_option("-b", "--bins", dest="bins", help="Number of bins (don't use this option for now)", type="int", default=10)
+parser.add_option("-b", "--bins", dest="bins", help="Number of bins (only when format option 'window' is used)", type="int", default=DEFAULT_BINS)
 
 (options, args) = parser.parse_args()
 
@@ -39,10 +41,14 @@ formatter_options = {"bins":options.bins}
 
 result = peak_stats.peak_stats(peaks, data, formatter[format], formatter_options)
 
+if options.format == "window" and options.bins == DEFAULT_BINS:
+	sys.stderr.write("Using default of %d bins, specify a different bin number with the -b option\n")
+
 if format == "catch":
 	name = splitext(basename(datafile))[0]
 	print "## %s" % name
 	print "## %s" % name
 
 for row in result:
-	print row
+	if row:
+		print row

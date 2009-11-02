@@ -62,7 +62,7 @@ def peak_and_tuple_all_formatter(peak, overlap, options={}):
 
 def bin_formatter(peak, overlap, options={"bins":10}):
 	nr_bins = options["bins"]
-	l = (peak[2] - peak[1] + 1) / nr_bins
+	l = (peak[2] - peak[1])/ float(nr_bins)
 	bins = [0] * nr_bins
 	
 
@@ -71,8 +71,7 @@ def bin_formatter(peak, overlap, options={"bins":10}):
 		if feature[2] > peak[2]:
 			m = peak[2]
 
-		for i in range((feature[1] - peak[1]) / l, (m - peak[1]) / l):
-			#print i
+		for i in range(int((feature[1] - peak[1])  / l ),int((m - peak[1] - 1) / l + 1)):
 			bins[i] += 1	
 
 	return "%s\t%s\t%s\t" % (peak[0], peak[1], peak[2]) + "\t".join([str(x) for x in bins])
@@ -128,8 +127,9 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, formatter_opt
 
 	prev_data_seq = ""
 	while peak_feature:
+		#print "peak:", peak_feature
 		overlap = []
-		
+		#print "step 1"	
 		while data_feature and peak_feature and (data_feature[0] > peak_feature[0]):
 			#print data_feature, peak_feature
 			if zeroes:	
@@ -156,17 +156,29 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, formatter_opt
 				if zeroes:
 					ret.append(formatter(peak_feature, [], formatter_options))
 				#sys.stderr.write("NO OVERLAP: %s\t%s\t%s\n" % peak_feature[:3])
+		#print "step 2"	
+		
+		#print "peak before", peak_feature
 		peak_feature = peak_track.get_next_feature()
+		#print "peak after", peak_feature
+		
+		#print "step 3"	
+		
 		#print "p3:", peak_feature	
+		#print data_feature
 		data_feature = data_track.get_previous_feature()
+		#print "step 4"	
 		while data_feature and peak_feature and ((data_feature[2] >= peak_feature[1] and data_feature[0] == peak_feature[0]) or data_feature[0] > peak_feature[0]):
+			print data_feature, "-", peak_feature
 			#print "GO BACK peak", peak_feature, " data", data_feature
 			data_feature = data_track.get_previous_feature()
+		#print "step 5"	
 		
 		#print "This is where we are: %s" % str(data_feature)
 		if data_feature:
 			data_feature = data_track.get_previous_feature()
 		
+		#print "step 3"	
 		#print "This is where we are: %s" % str(data_feature)
 		if not data_feature:
 			data_feature = data_track.get_next_feature()
