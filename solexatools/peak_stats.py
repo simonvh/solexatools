@@ -169,7 +169,7 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, formatter_opt
 		data_feature = data_track.get_previous_feature()
 		#print "step 4"	
 		while data_feature and peak_feature and ((data_feature[2] >= peak_feature[1] and data_feature[0] == peak_feature[0]) or data_feature[0] > peak_feature[0]):
-			print data_feature, "-", peak_feature
+			#print data_feature, "-", peak_feature
 			#print "GO BACK peak", peak_feature, " data", data_feature
 			data_feature = data_track.get_previous_feature()
 		#print "step 5"	
