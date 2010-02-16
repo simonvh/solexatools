@@ -2,7 +2,7 @@
 import sys
 import re
 import os
-from numpy import max,mean
+from numpy import max,mean,sum
 from solexatools.track import SimpleTrack
 
 def max_val(features):
@@ -24,6 +24,12 @@ def fraction(features, f):
 def max_formatter(peak, overlap, options={}):
 	if overlap:
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], max_val(overlap))
+	else:
+		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
+
+def sum_formatter(peak, overlap, options={}):
+	if overlap:
+		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], sum([x[3] for x in overlap]))
 	else:
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
 
