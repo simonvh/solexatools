@@ -82,6 +82,13 @@ def bin_formatter(peak, overlap, options={"bins":10}):
 
 	return "%s\t%s\t%s\t" % (peak[0], peak[1], peak[2]) + "\t".join([str(x) for x in bins])
 
+def dist_to_center_formatter(peak, overlap, options={}):
+	dist = []
+	center = peak[1] + (peak[2] - peak[1]) / 2
+	for feature in overlap:
+		dist.append((abs(feature[1] + (feature[2] - feature[1]) / 2 - center), feature[3]))
+	return peak, dist
+		
 
 
 CATCH_SPACING = 10
