@@ -30,6 +30,7 @@ class SimpleTrack:
 		self.eof = False
 		self.p = re.compile(r'chrom=(\w+)\s+start=(\d+)\s+step=(\d+)\s+span=(\d+)')
 		self.line_index = []
+		self.lines = []
 		self.line_index.append(self.fh.tell())
 		if mem:
 			self.lines = self.fh.readlines()
