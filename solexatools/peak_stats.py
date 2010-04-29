@@ -73,13 +73,19 @@ def bin_formatter(peak, overlap, options={"bins":10}):
 	
 
 	for feature in overlap:
+		
+		#print "feature", feature
 		m = feature[2]
 		if feature[2] > peak[2]:
 			m = peak[2]
 
 		for i in range(int((feature[1] - peak[1])  / l ),int((m - peak[1] - 1) / l + 1)):
-			bins[i] += 1	
-
+			if i >= 0:
+				#print "BIN %i +1," % i, bins[99]
+				bins[i] += 1	
+	if len(peak) >= 5 and peak[4] and peak[4] == "-":
+		bins = bins[::-1]
+		
 	return "%s\t%s\t%s\t" % (peak[0], peak[1], peak[2]) + "\t".join([str(x) for x in bins])
 
 def dist_to_center_formatter(peak, overlap, options={}):
