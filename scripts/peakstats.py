@@ -43,7 +43,7 @@ formatter_options = {"bins":options.bins}
 result = peak_stats.peak_stats(peaks, data, formatter[format], formatter_options)
 
 if options.format == "window" and options.bins == DEFAULT_BINS:
-	sys.stderr.write("Using default of %d bins, specify a different bin number with the -b option\n")
+	sys.stderr.write("Using default of %d bins, optionally specify a different bin number with the -b option\n" % options.bins)
 
 if format == "catch":
 	name = splitext(basename(datafile))[0]

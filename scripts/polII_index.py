@@ -31,17 +31,43 @@ def genes_to_promoters_and_exons(file, up, down):
 	exon_data = {}
 	chr = {}
 	strand = {}
-	for line in open(file):
+	type = "BED"
+	if file.endswith(".gff"):
+		type = "GFF"
+	line = ""
+	f = open(file)
+	while not line or line.startswith("browser") or line.startswith("track"):
+		line = f.readline()
+	vals = line.strip().split("\t")
+	try:
+		int(vals[3]), int(vals[4])
+		type = "GFF"
+	except:
+		pass
+	strand_col, start_col, end_col = 5, 1, 2
+	if type == "GFF":
+		strand_col, start_col, end_col = 6, 3, 4
+
+	while line:
 		vals = line[:-1].split("\t")
-		name = vals[8].split(";")[0].split(" ")[1]
+		if type == "BED":
+			name = vals[3]
+		else:
+			try:
+				name = vals[8].split(";")[0].split(" ")[1]
+			except:
+				name = vals[8]
 
 		chr[name] = vals[0]
-		strand[name] = vals[6]
+		
+		strand[name] = vals[strand_col]
 		if exon_data.has_key(name):
-			exon_data[name].append((int(vals[3]), int(vals[4])))
+			exon_data[name].append((int(vals[start_col]), int(vals[end_col])))
 		else:
-			exon_data[name] = [(int(vals[3]), int(vals[4]))]
+			exon_data[name] = [(int(vals[start_col]), int(vals[end_col]))]
 
+		line = f.readline()
+	f.close()
 	exons = []
 	location = {}
 	promoter = []
