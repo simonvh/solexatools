@@ -58,6 +58,8 @@ def genes_to_promoters_and_exons(file, up, down):
 			except:
 				name = vals[8]
 
+		name = "%s_%s_%s" % (name, vals[0], vals[start_col])
+		
 		chr[name] = vals[0]
 		
 		strand[name] = vals[strand_col]
@@ -125,12 +127,19 @@ tmp = NamedTemporaryFile()
 tmpname = tmp.name
 f = open(tmpname, "w")
 seen = {}
+
+print len(exons)
+print exons[:10]
+sys.exit()
+
 for row in promoter:
 	p = "%s:%s-%s" % (row[0], row[1], row[2])
 	s = "%s\t%s\t%s\t%s\n" % (row[0], row[1], row[2], row[3])
 	if not seen.has_key(p):
 		f.write(s)
-		seen[p] = row[3]
+		seen[p] = [row[3]]
+	else:	
+		seen.append(row[3])
 f.close()
 
 #for k,v in seen.items():
@@ -155,7 +164,9 @@ for row in exons:
 	s = "%s\t%s\t%s\t%s\n" % (row[0], row[1], row[2], row[3])
 	if not seen.has_key(p):
 		f.write(s)
-		seen[p] = row[3]
+		seen[p] = [row[3]]
+	else:
+		seen.append(row[3])
 f.close()
 #for k,v in seen.items():
 #	print "EXON\t%s\t%s" % (k,v)
