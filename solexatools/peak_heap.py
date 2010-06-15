@@ -70,8 +70,7 @@ def peak_heap(peaks, data,merge=True):
 	while f:
 		count["%s:%s-%s" % (f[0],f[1],f[2])] = {}
 		f = peak_track.get_next_feature()
-
-
+	
 	# Now run peakstats for all samples
 	for sample, file in data.items():
 		#print sample, file

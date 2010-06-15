@@ -6,7 +6,7 @@ For any question, please ask Simon van Heeringen
 """
 
 setup (name = 'SolexaTools',
-		version = '0.1a',
+		version = '0.2',
 		description = DESCRIPTION,
 		author='Simon van Heeringen',
 		author_email='s.vanheeringen@ncmls.ru.nl',

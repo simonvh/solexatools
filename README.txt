@@ -6,7 +6,7 @@ Set of scripts to work with Solexa data.
 
 To build and install SolexaTools on Linux:
  python setup.py build
- python setup.py install
+ sudo python setup.py install
 
 For additional configuration see the documentation for Python
 
