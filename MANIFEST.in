@@ -1,0 +1,8 @@
+README.txt
+LICENSE.txt
+MANIFEST
+setup.py
+scripts/assign_peaks.py
+scripts/peakstats.py
+scripts/solexa_analysis.py
+solexatools/*.py

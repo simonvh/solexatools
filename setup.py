@@ -5,7 +5,7 @@ A set of scripts for working with Solexa data. Not (yet) intended for general di
 For any question, please ask Simon van Heeringen
 """
 
-setup (name = 'SolexaTools',
+setup (name = 'solexatools',
 		version = '0.2',
 		description = DESCRIPTION,
 		author='Simon van Heeringen',
