@@ -174,9 +174,13 @@ for gene in prom_result.keys():
 	if gene_result.has_key(gene):
 		body = gene_result[gene]
 		body_norm = body / float(gene_length[gene]) * (upstream + downstream)
-		ratio = log((prom + 1)/ (body_norm + 1))/log(2)
-		length = gene_length[gene] + upstream	
-		rel_length = (gene_length[gene] - downstream) / (upstream + downstream)
+		if body_norm > 0:
+			ratio = log((prom)/ (body_norm))/log(2)
+		else:
+			body_norm = "NA"
+		
+		length = gene_length[gene] + upstream	+ downstream
+		rel_length = gene_length[gene]  / float(upstream + downstream)
 	name = gene.split("_|_")[0]
 	print "%s\t%s\t%s\t%s\t%s\t%s\t%s" % (location[gene], name, (prom + body) /  length , prom, body_norm, ratio, rel_length )
 

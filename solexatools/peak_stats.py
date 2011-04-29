@@ -39,6 +39,12 @@ def mean_formatter(peak, overlap, options={}):
 	else:
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
 
+def length_formatter(peak, overlap, options={}):
+	if overlap:
+		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], sum([x[2] - x[1] for x in overlap]))
+	else:
+		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
+
 def maxfeature_formatter(peak, overlap, options={}):
 	if overlap:
 		return "\t".join([str(x) for x in max_feature(overlap)])
