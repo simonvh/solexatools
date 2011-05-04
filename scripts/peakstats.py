@@ -8,8 +8,8 @@ from os.path import basename,splitext
 DEFAULT_BINS=10
 
 parser = OptionParser()
-parser.add_option("-p", "--peakfile", dest="peakfile", help="Peaks in (fixedStep) Wiggle/bed format", metavar="FILE")
-parser.add_option("-d", "--datafile", dest="datafile", help="Data in (fixedStep) Wiggle format", metavar="FILE")
+parser.add_option("-p", "--peakfile", dest="peakfile", help="Peaks in (fixedStep) Wiggle or BED format", metavar="FILE")
+parser.add_option("-d", "--datafile", dest="datafile", help="Data in (fixedStep) Wiggle or BED format", metavar="FILE")
 parser.add_option("-f", "--format", dest="format", help="Output format: all|number|max|mean|sum|maxfeature|length|catch|window", metavar="F", default="all")
 parser.add_option("-z", "--zeroes", dest="zeroes", help="Print zeroes", action="store_true", default=False)
 parser.add_option("-b", "--bins", dest="bins", help="Number of bins (only when format option 'window' is used)", type="int", default=DEFAULT_BINS)
