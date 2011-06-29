@@ -20,5 +20,6 @@ setup (name = 'solexatools',
 			'scripts/coverage_profile.py',
 			'scripts/other_profile.py',
 			'scripts/polII_index.py',
+			'scripts/rpkm_rnapii.py',
 			],
 )
