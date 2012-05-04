@@ -4,6 +4,8 @@ import re
 import os
 from numpy import max,mean,sum
 from solexatools.track import SimpleTrack
+import pysam
+import subprocess
 
 def max_val(features):
 	test = map(lambda x: x[3], features)
@@ -52,13 +54,13 @@ def maxfeature_formatter(peak, overlap, options={}):
 		return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], 0)
 		
 def number_formatter(peak, overlap, options={}):
-    return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], len(overlap))
+	return "%s\t%s\t%s\t%s" % (peak[0], peak[1], peak[2], len(overlap))
 
 def tuple_number_formatter(peak, overlap, options={}):
-    return (peak[0], peak[1], peak[2], len(overlap))
+	return (peak[0], peak[1], peak[2], len(overlap))
 
 def all_formatter(peak, overlap, options={}):
-	return "\n".join("%s\t%s\t%s\t%s" % x[:4] for x in overlap)
+	return "\n".join("\t".join([str(y) for y in x if y]) for x in overlap)
 
 def tuple_all_formatter(peak, overlap, options={}):
 	if overlap:
@@ -210,7 +212,34 @@ def peak_stats(peak_track, data_track, formatter=number_formatter, formatter_opt
 		#print "This is where we are: %s" % str(data_feature)
 	return ret
 
-def binned_peak_stats(peak_track, data_track, window, binsize, formatter=number_formatter, zeroes=True):
+def bam_peak_stats(peak_track, data_bam, formatter=number_formatter, formatter_options={}, zeroes=True):
+	bamfile = pysam.Samfile(data_bam, "rb" )
+	total_reads = sum([bamfile.count(ref) for ref in bamfile.references]) / 1000000.0
+	
+	strand_map = {True:"-", False: "+"}
+	ret = []
+	peak_feature = peak_track.get_next_feature()
+
+	while peak_feature:
+		#print "peak:", peak_feature
+		overlap = []
+		#print "step 1"	
+		chrom = peak_feature[0]
+		p_start = peak_feature[1]
+		p_end = peak_feature[2]
+
+		overlap = [[chrom, align.pos, align.pos + align.alen, 1, strand_map[align.is_reverse]] for align in bamfile.fetch(chrom, p_start, p_end)]
+		
+		if len(overlap) > 0:
+			ret.append(formatter(peak_feature, overlap, formatter_options))
+		else:	
+			if zeroes:
+				ret.append(formatter(peak_feature, [], formatter_options))
+		
+		peak_feature = peak_track.get_next_feature()
+	return ret
+
+def binned_peak_stats(peak_track, data_track, window, binsize):
 	ret = []
 	peak_feature = peak_track.get_next_feature()
 	#print "p1:", peak_feature	
@@ -258,3 +287,87 @@ def binned_peak_stats(peak_track, data_track, window, binsize, formatter=number_
 		#print overlap[bin]
 		ret.append([bin, mean(overlap[bin])])
 	return ret
+
+def add_read_to_list(read, min_strand, plus_strand):
+	if read.is_reverse:
+		min_strand.append(read.pos)
+	else:
+		plus_strand.append(read.pos)
+
+def bam_binned_peak_stats(peak_track, data_bam, nr_bins, rpkm=True, remove_dup=False):
+	bamfile = pysam.Samfile(data_bam, "rb")
+	read_len = 100 
+	for read in bamfile.fetch():
+		if read.alen:
+			read_len = read.alen
+			break	
+	sys.stderr.write("Using read length 35\n")
+	
+	total_reads = 1
+	if rpkm:
+		sys.stderr.write("Counting...\n")
+		if remove_dup:	
+			# This is slow.. but necessary
+			cmd = 'samtools view %s |perl -nale \'if ($F[1] & 0x0010) {$strand = "-"} else {$strand = "+";} print join("\t", $F[2], $F[3] - 1, $F[3] + length($F[9]) - 1, 0, 0, $strand);\' |sort -u -S 8G |wc -l'
+			sys.stderr.write((cmd % data_bam) + "\n")
+			total_reads = int(subprocess.Popen(cmd % data_bam, shell=True, stdout=subprocess.PIPE).communicate()[0].strip()) / 1000000.0
+		else:
+			total_reads = sum([bamfile.count(ref) for ref in bamfile.references]) / 1000000.0
+		sys.stderr.write("Done...\n")
+
+	ret = []
+	peak_feature = peak_track.get_next_feature()
+
+	count = 1 
+	while peak_feature:
+		chrom = peak_feature[0]
+		binsize = (peak_feature[2] - peak_feature[1]) / float(nr_bins)
+		row = []
+
+		overlap = []
+		min_strand = []
+		plus_strand = []
+		if remove_dup:
+			bamfile.fetch(chrom, peak_feature[1], peak_feature[2], callback=lambda x: add_read_to_list(x, min_strand, plus_strand))	
+			min_strand = sorted(set(min_strand))
+			plus_strand = sorted(set(plus_strand))
+		bin_start = peak_feature[1]
+		while int(bin_start + 0.5) < peak_feature[2]:
+			num_reads = 0
+			
+			if remove_dup:
+				i = 0
+				while i < len(min_strand) and min_strand[i] <= int(bin_start + binsize + 0.5):
+					num_reads += 1
+					i += 1
+				while len(min_strand) > 0 and min_strand[0] + read_len <= int(bin_start + binsize + 0.5):
+					min_strand.pop(0)
+				
+				i = 0
+				while i < len(plus_strand) and plus_strand[i] <= int(bin_start + binsize + 0.5):
+					num_reads += 1
+					i += 1
+				while len(plus_strand) > 0 and plus_strand[0] + read_len <= int(bin_start + binsize + 0.5):
+					plus_strand.pop(0)
+			
+			else:
+				num_reads = bamfile.count(peak_feature[0], int(bin_start + 0.5), int(bin_start + binsize + 0.5))
+			
+			if rpkm:
+				per_kb = num_reads * (1000.0 / binsize)
+				row.append(per_kb / total_reads)	
+			else:
+				row.append(num_reads)	
+			
+			bin_start += binsize	
+		
+		if peak_feature[-1] == "-":
+			row = row[::-1]
+		
+		ret.append( [peak_feature[x] for x in range(3)] + row)
+		count += 1
+		if count % 1000 == 0:
+			sys.stderr.write("%s processed\n" % count)
+		peak_feature = peak_track.get_next_feature()
+
+	return ["\t".join([str(x) for x in row]) for row in ret]

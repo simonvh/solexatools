@@ -174,7 +174,7 @@ for gene in prom_result.keys():
 	if gene_result.has_key(gene):
 		body = gene_result[gene]
 		body_norm = body / float(gene_length[gene]) * (upstream + downstream)
-		if body_norm > 0:
+		if body_norm > 0 and prom > 0:
 			ratio = log((prom)/ (body_norm))/log(2)
 		else:
 			body_norm = "NA"
