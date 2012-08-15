@@ -14,6 +14,7 @@ For additional configuration see the documentation for Python
 
 o "Python" http://www.python.org/
 o "Numerical Python" http://numpy.scipy.org/
+o "pysam" http://code.google.com/p/pysam/
 
 ### Bugs ###
 

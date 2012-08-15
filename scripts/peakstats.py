@@ -7,7 +7,7 @@ from os.path import basename,splitext
 import os
 
 DEFAULT_BINS = 10
-VERSION = "2.0"
+VERSION = "2.1"
 usage = "Usage: %prog -p BEDFILE -d DATAFILE [options]\nVersion: " + str(VERSION)
 
 parser = OptionParser(usage=usage, version="%prog " + str(VERSION))
@@ -18,12 +18,13 @@ parser.add_option("-z", "--zeroes", dest="zeroes", help="Print zeroes", action="
 parser.add_option("-b", "--bins", dest="bins", help="Number of bins (only when format option 'window' is used)", type="int", default=DEFAULT_BINS)
 parser.add_option("--rpkm", dest="rpkm", help="Report RPKM (only with BAM datafile and format option 'window')", default=False, action="store_true")
 parser.add_option("--remove_dup", dest="remove_dup", help="Remove duplicates (only with BAM datafile and format option 'window')", default=False, action="store_true")
+parser.add_option("--unique", dest="unique", help="Only uniquely mapped reads (only with BAM datafile and format option 'window')", default=False, action="store_true")
 
 (options, args) = parser.parse_args()
 
 if not options.peakfile or not options.datafile:
 	parser.print_help()
-	sys.exit(0)
+	sys.exit(1)
 
 peakfile = options.peakfile
 datafile = options.datafile
@@ -52,7 +53,7 @@ if datafile.endswith("bam"):
 		print "Please provide a sorted and indexed bam file"
 		sys.exit(1)
 	if options.format =="window":
-		result = peak_stats.bam_binned_peak_stats(peaks, datafile, options.bins, options.rpkm, options.remove_dup)
+		result = peak_stats.bam_binned_peak_stats(peaks, datafile, options.bins, options.rpkm, options.remove_dup, options.unique)
 	else:
 		result = peak_stats.bam_peak_stats(peaks, datafile, formatter[format], formatter_options)
 

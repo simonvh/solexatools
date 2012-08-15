@@ -228,7 +228,7 @@ def bam_peak_stats(peak_track, data_bam, formatter=number_formatter, formatter_o
 		p_start = peak_feature[1]
 		p_end = peak_feature[2]
 
-		overlap = [[chrom, align.pos, align.pos + align.alen, 1, strand_map[align.is_reverse]] for align in bamfile.fetch(chrom, p_start, p_end)]
+		overlap = [[chrom, align.pos, align.pos + align.alen, 1, strand_map[align.is_reverse]] for align in bamfile.fetch(chrom, p_start, p_end) if align.pos and align.alen]
 		
 		if len(overlap) > 0:
 			ret.append(formatter(peak_feature, overlap, formatter_options))
@@ -288,13 +288,15 @@ def binned_peak_stats(peak_track, data_track, window, binsize):
 		ret.append([bin, mean(overlap[bin])])
 	return ret
 
-def add_read_to_list(read, min_strand, plus_strand):
-	if read.is_reverse:
-		min_strand.append(read.pos)
-	else:
-		plus_strand.append(read.pos)
+def add_read_to_list(read, min_strand, plus_strand, unique=False):
+	if not unique or ("X0",1) in read.tags:
+		if read.is_reverse:
+			min_strand.append(read.pos)
+		else:
+			plus_strand.append(read.pos)
 
-def bam_binned_peak_stats(peak_track, data_bam, nr_bins, rpkm=True, remove_dup=False):
+def bam_binned_peak_stats(peak_track, data_bam, nr_bins, rpkm=True, remove_dup=False, unique=False):
+	sys.stderr.write("bam: %s RPKM: %s remove_dup: %s unique: %s\n" % (data_bam, rpkm, remove_dup, unique))
 	bamfile = pysam.Samfile(data_bam, "rb")
 	read_len = 100 
 	for read in bamfile.fetch():
@@ -327,15 +329,20 @@ def bam_binned_peak_stats(peak_track, data_bam, nr_bins, rpkm=True, remove_dup=F
 		overlap = []
 		min_strand = []
 		plus_strand = []
+#		if remove_dup:
+		bamfile.fetch(chrom, peak_feature[1], peak_feature[2], callback=lambda x: add_read_to_list(x, min_strand, plus_strand, unique))	
+		#print plus_strand
 		if remove_dup:
-			bamfile.fetch(chrom, peak_feature[1], peak_feature[2], callback=lambda x: add_read_to_list(x, min_strand, plus_strand))	
 			min_strand = sorted(set(min_strand))
 			plus_strand = sorted(set(plus_strand))
+		else:
+			min_strand = sorted(min_strand)
+			plus_strand = sorted(plus_strand)
+		#print plus_strand
 		bin_start = peak_feature[1]
 		while int(bin_start + 0.5) < peak_feature[2]:
 			num_reads = 0
-			
-			if remove_dup:
+			if 1:#remove_dup:
 				i = 0
 				while i < len(min_strand) and min_strand[i] <= int(bin_start + binsize + 0.5):
 					num_reads += 1
@@ -350,8 +357,8 @@ def bam_binned_peak_stats(peak_track, data_bam, nr_bins, rpkm=True, remove_dup=F
 				while len(plus_strand) > 0 and plus_strand[0] + read_len <= int(bin_start + binsize + 0.5):
 					plus_strand.pop(0)
 			
-			else:
-				num_reads = bamfile.count(peak_feature[0], int(bin_start + 0.5), int(bin_start + binsize + 0.5))
+			#else:
+			#	num_reads = bamfile.count(peak_feature[0], int(bin_start + 0.5), int(bin_start + binsize + 0.5))
 			
 			if rpkm:
 				per_kb = num_reads * (1000.0 / binsize)
