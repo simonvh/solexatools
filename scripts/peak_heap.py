@@ -5,8 +5,11 @@
 # Author: Simon van Heeringen <s.vanheeringen@ncmls.ru.nl
 #
 import sys
+import os
 from optparse import OptionParser
 from solexatools.peak_heap import *
+
+EXTS=[".bed", ".bam"]
 
 parser = OptionParser()
 parser.add_option("-p", "--peakfile(s)", dest="peakfile", help="Peaks in wiggle/bed format, seperated by commas", metavar="FILES")
@@ -20,7 +23,15 @@ if not options.peakfile or not options.datafile:
 	sys.exit(0)
 
 peakfiles = [x.strip() for x in options.peakfile.split(",")]
-datafiles = dict([(x.strip().replace(".bed",""), x.strip()) for x in options.datafile.split(",")])
+
+datafiles = {}
+for fname in options.datafile.split(","):
+	root,ext = os.path.splitext(fname)
+	if not ext in EXTS:
+		print "Only bed or bam files are supported!"
+		sys.exit(1)
+	else:
+		datafiles[os.path.basename(root)] = fname
 
 result = peak_heap(peakfiles, datafiles, options.merge)
 samples = sorted(datafiles.keys())

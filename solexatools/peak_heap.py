@@ -45,7 +45,7 @@ def _make_one_peak_file(peaks, filename, merge=True):
 	else:
 		os.rename(tempname, filename)
 
-def peak_heap(peaks, data,merge=True):
+def peak_heap(peaks, data, merge=True, rpkm=False, rmdup=True, rmrepeats=True):
 	""" peak_heap(peaks, data)
 			peaks: list of peakfiles in BED format
 			data: dictionary containging name, read files in BED format items
@@ -72,16 +72,18 @@ def peak_heap(peaks, data,merge=True):
 		f = peak_track.get_next_feature()
 	
 	# Now run peakstats for all samples
-	for sample, file in data.items():
+	for sample, fname in data.items():
 		#print sample, file
 		peak_track = SimpleTrack(peakfile)
-		data_track = SimpleTrack(file)
-		result = peak_stats.peak_stats(peak_track, data_track, peak_stats.number_formatter)
+		
+		if fname.endswith("bam"):
+			result = peak_stats.bam_binned_peak_stats(peak_track, fname, 1, rpkm, rmdup, rmrepeats)
+		else:
+			data_track = SimpleTrack(fname)
+			result = peak_stats.peak_stats(peak_track, data_track, peak_stats.number_formatter)
 		for row in result:
 			vals = row.strip().split("\t")
 			count["%s:%s-%s" % (vals[0], vals[1], vals[2])][sample] = int(vals[3])
-
-
 
 	return count
 
