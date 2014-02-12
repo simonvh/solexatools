@@ -2,7 +2,7 @@
 import sys
 import re
 import os
-from numpy import max,mean,sum
+from numpy import max,mean,sum,median
 from solexatools.track import SimpleTrack
 import pysam
 import subprocess
@@ -302,11 +302,11 @@ def bam_binned_peak_stats(peak_track, data_bam, nr_bins, rpkm=True, remove_dup=F
     lens = []
     c = 0
     for read in bamfile:
+        lens.append(read.qlen or read.alen)
         c += 1
-        lens.append(len(read.seq))
         if c >= 1000:
             break
-    read_len = max(lens)
+    read_len = median(lens)
         
     sys.stderr.write("Using read length {0}\n".format(read_len))
     
