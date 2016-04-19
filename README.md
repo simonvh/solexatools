@@ -1,8 +1,12 @@
-# Note: this is ported from the SVN repo, should probably be updated
+# Note
+
+Most of the functionality in these scripts is covered by [bedtools](http://bedtools.readthedocs.org/).
+Therefore, these scripts are no longer maintained.
+In some cases `peakstats.py` might still prove useful.
 
 # SolexaTools README 
 
-Set of scripts to work with Solexa data.
+Set of scripts to work with HTS data.
 
 ## Short installation instructions
 
@@ -21,4 +25,4 @@ For additional configuration see the documentation for Python
 
 ## Bugs
 
-Please send bugs and/or comments to s.vanheeringen@ncmls.ru.nl
+Please send bugs and/or comments to s.vanheeringen@science.ru.nl
