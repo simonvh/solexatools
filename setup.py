@@ -8,10 +8,10 @@ For any question, please ask Simon van Heeringen
 """
 
 setup (name = 'solexatools',
-		version = '0.22',
+		version = '2.1',
 		description = DESCRIPTION,
 		author='Simon van Heeringen',
-		author_email='s.vanheeringen@ncmls.ru.nl',
+		author_email='s.vanheeringen@science.ru.nl',
 		license='MIT',
 		packages=['solexatools'],
 		cmdclass = {'build_ext': build_ext},
